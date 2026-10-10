@@ -1,0 +1,30 @@
+CRT HOUSE CONSOLE v0.3.4 — VALIDATION
+=====================================
+
+BASELINE: v0.3.3 source unchanged except explicitly reviewed presentation,
+state-filter, network-allocation-lifetime, and test modifications.
+
+SOURCE / TESTS
+- Host tests compile under g++ with -Wall -Wextra -Werror and ASAN/UBSAN.
+- New parser tests cover Icecast metadata text=, tag removal, artist/title
+  separation, empty values, stream URL fallback, and sanitization bounds.
+- App-model tests cover v0.10 source.type=radio, source.status=playing/paused,
+  station/bitrate/format, RADIO INFO replacing TRACK QUEUE, and metadata-only
+  changes triggering the song overlay. Older-server URL fallback tested.
+- Original test set retained for radio-free playback, node identity,
+  CRT margins, button navigation, and microphone visualizer.
+- Render snapshots for radio Now Playing and Radio Info are available from
+  host tests; visual dimensions and text bounds are checked.
+
+NOT VERIFIED
+- Arduino-ESP32 2.0.14 target compilation
+- Live radio /state response on user's installed Pi and long-running runtime
+- Long-term heap stability through repeated Wi-Fi disconnects/reconnects
+
+MEMORY CAUTION
+- DynamicJsonDocument capacity remains 12288 bytes (not increased).
+- Radio fields are selected through the existing StaticJsonDocument<2048>
+  deserialization filter; fixed-size snapshot fields are modestly enlarged.
+- Buffer retained across disconnections only AFTER first successful allocation.
+- A reconnect with less heap available could still cause another class of
+  failure; no claim of permanent memory-stability fix is made.
