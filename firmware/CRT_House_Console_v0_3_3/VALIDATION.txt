@@ -1,0 +1,54 @@
+CRT HOUSE CONSOLE v0.3.3 VALIDATION
+====================================
+
+Observed input report:
+  v0.3.1 worked after the JSON-buffer hotfix.
+  v0.3.2 appears unable to join Wi-Fi; SSID/password have been checked.
+No board-side Wi-Fi reason or heap measurement was supplied. The cause of that
+specific connection failure is NOT proven by this source-only investigation.
+
+Executed checks:
+  bash extras/tests/run.sh
+  C++11, warnings as errors, AddressSanitizer, UndefinedBehaviorSanitizer.
+
+PASS 21759 assertions. Pulse range 0.102..0.984; gain-invariance max error 0.0008
+Models bytes: renderers=6348 presence=9424 devices=10096 music=200
+PASS live-only projection against v0.3.2 identity merge: 2000 snapshots, 101305 checks.
+Removed merge scratch: 10096 bytes; queue snapshot: 2380 -> 1240 bytes.
+PASS app readers, reachability retries, test-overlay exclusion, and 286 layout frames (1349591 assertions).
+Snapshot sizes: HOUSE 744, TRACKQ 1240, NODES 3908, HEALTH 528; each queue has ONE slot.
+Host checks complete. These are NOT an ESP32 target build.
+
+What the additional tests cover:
+  - Live-only projection matches the prior identity merge for 2,000 generated
+    snapshots, including muted controllers, missing leases, multiple receiver
+    IDs per controller, equal model names, and lagging/incomplete metadata.
+  - Driver-init failure prevents WiFi.begin; retry repeats initialization.
+  - Rejected Wi-Fi begin and failed reconnect take the restart-attempt path.
+  - Association versus DHCP-wait and disconnect reason display are distinct.
+  - All diagnostic text remains within the existing safe area.
+  - Five-entry MPD request and filename/title/artist fallback parsing still work.
+  - Existing music processing, navigation, eight-page layouts and geometry.
+
+Memory calculation (POD buffers, without queue-control-block overhead):
+  Removed static DeviceList scratch array:                  10,096 bytes
+  Queue snapshot: 2,380 -> 1,240; worker/display/queue copy:  3,420 bytes saved
+  Total removed buffer payload:                            13,516 bytes
+  New diagnostics add a small amount of RAM; actual net heap needs measurement.
+  JSON (12,288 bytes) is additionally deferred until Wi-Fi connects and released
+  while Wi-Fi is disconnected. It is NOT reduced during normal API operation.
+
+Not verified:
+  - ESP32 target compilation. No ESP32 compiler exists in this runtime and the
+    attempted toolchain/source download could not resolve the external host.
+  - Wi-Fi association/DHCP on the physical DFR0478 or actual free heap values.
+  - Hardware queue/page/audio behavior. Interface stubs do not simulate Wi-Fi,
+    ArduinoJson's real parser, FreeRTOS allocation, or the video DMA buffers.
+
+External implementation references:
+  Espressif Wi-Fi init/start memory failure returns:
+    https://docs.espressif.com/projects/esp-idf/en/v4.4.7/esp32/api-reference/network/esp_wifi.html
+  Heap inspection and allocation-failure hook:
+    https://docs.espressif.com/projects/esp-idf/en/v4.4.7/esp32/api-reference/system/heap_debug.html
+  Wi-Fi events (event callback only records atomic values here):
+    https://docs.espressif.com/projects/arduino-esp32/en/latest/api/wifi.html

@@ -1,0 +1,23 @@
+# Never commit real local Wi-Fi credentials or private notes.
+secrets.h
+credentials.h
+.env
+.env.*
+*.local.h
+*.local.ini
+*.local.json
+
+# Arduino/build artifacts and editor state.
+**/build/
+**/.pio/
+*.elf
+*.bin
+*.map
+*.o
+*.d
+*.pyc
+.vscode/
+.idea/
+*.log
+.DS_Store
+Thumbs.db
